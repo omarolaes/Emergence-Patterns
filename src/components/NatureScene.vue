@@ -3,98 +3,103 @@
 </template>
 
 <script>
-import * as THREE from 'three';
-import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
-import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
-import { gsap } from 'gsap';
+import * as THREE from "three";
+import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
+import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
+import { gsap } from "gsap";
 
 export default {
-  name: 'NatureSceneMatCap',
+  name: "NatureSceneMatCap",
   mounted() {
     this.initScene();
     this.animate();
-    window.addEventListener('resize', this.onWindowResize, false);
-    window.addEventListener('mousemove', this.onMouseMove, false);
+    window.addEventListener("resize", this.onWindowResize, false);
+    window.addEventListener("mousemove", this.onMouseMove, false);
   },
   beforeUnmount() {
-    window.removeEventListener('resize', this.onWindowResize, false);
-    window.removeEventListener('mousemove', this.onMouseMove, false);
+    window.removeEventListener("resize", this.onWindowResize, false);
+    window.removeEventListener("mousemove", this.onMouseMove, false);
   },
   methods: {
     initScene() {
       this.scene = new THREE.Scene();
-
-      this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-
+      this.camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
       this.renderer = new THREE.WebGLRenderer({ antialias: true });
       this.renderer.setSize(window.innerWidth, window.innerHeight);
       this.renderer.setPixelRatio(window.devicePixelRatio);
       this.$refs.container.appendChild(this.renderer.domElement);
-
-      this.scene.background = new THREE.Color(0x111111);
-
+      this.scene.background = new THREE.Color(0x888888);
       const loader = new FontLoader();
-      loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', (font) => {
-        const textGeometry = new TextGeometry('NATURE', {
-          font: font,
-          size: 4,
-          height:1,
-        });
-
-        // Load the MatcapTexture
-        const matcapTextureLoader = new THREE.TextureLoader();
-        matcapTextureLoader.load('https://raw.githubusercontent.com/nidorx/matcaps/master/128/39433A_65866E_86BF8B_BFF8D8-128px.png', (texture) => {
-          const textMaterial = new THREE.MeshMatcapMaterial({ matcap: texture });
-          const text = new THREE.Mesh(textGeometry, textMaterial);
-          this.scene.add(text);
-        });
-      });
-
+      // 433D3F_A58D7D_786760_8C7C6D
+      loader.load(
+        "https://threejs.org/examples/fonts/helvetiker_regular.typeface.json",
+        (font) => {
+          const textGeometry = new TextGeometry("*perro", {
+            font: font,
+            size: 4,
+            height: 1,
+          });
+          const matcapTextureLoader = new THREE.TextureLoader();
+          matcapTextureLoader.load(
+            "https://raw.githubusercontent.com/nidorx/matcaps/master/256/85B9D3_C9EAF9_417277_528789-256px.png",
+            (texture) => {
+              const textMaterial = new THREE.MeshMatcapMaterial({
+                matcap: texture,
+              });
+              const text = new THREE.Mesh(textGeometry, textMaterial);
+              this.scene.add(text);
+            }
+          );
+        }
+      );
       this.camera.rotation.y = 0.25;
-      this.camera.position.z = 8;
-      this.camera.position.y = 1;
-      this.camera.position.x = 12;
-
+      this.camera.position.z = 6;
+      this.camera.position.y = 1.5;
+      this.camera.position.x = 12
       this.raycaster = new THREE.Raycaster();
       this.mouse = new THREE.Vector2();
     },
     createFlower() {
       const flower = new THREE.Group();
-
       const scaleFactor = Math.random() * 0.5 + 0.5;
-
-      // Load the MatcapTexture for spheres
       const matcapTextureLoader = new THREE.TextureLoader();
-      matcapTextureLoader.load('https://raw.githubusercontent.com/nidorx/matcaps/master/128/39433A_65866E_86BF8B_BFF8D8-128px.png', (texture) => {
-        for (let i = 0; i < 5; i++) {
-          const geometry = new THREE.SphereGeometry((Math.random() * 1) * scaleFactor, 32);
-          const material = new THREE.MeshMatcapMaterial({ matcap: texture });
-          const petal = new THREE.Mesh(geometry, material);
-
-          petal.position.x = Math.cos((i * 2 * Math.PI) / 5);
-          petal.position.y = Math.sin((i * 2 * Math.PI) / 5);
-          flower.add(petal);
+      matcapTextureLoader.load(
+        "https://raw.githubusercontent.com/nidorx/matcaps/master/256/85B9D3_C9EAF9_417277_528789-256px.png",
+        (texture) => {
+          // Create 5 petals
+          for (let i = 0; i < 5; i++) {
+            const geometry = new THREE.SphereGeometry(
+              Math.random() * 1 * scaleFactor,
+              32
+            );
+            const material = new THREE.MeshMatcapMaterial({ matcap: texture });
+            const petal = new THREE.Mesh(geometry, material);
+            petal.position.x = Math.cos((i * 2 * Math.PI) / 5);
+            petal.position.y = Math.sin((i * 2 * Math.PI) / 5);
+            petal.position.z = -0.5;
+            flower.add(petal);
+          }
         }
-      });
-
+      );
       return flower;
     },
     onMouseMove(event) {
       event.preventDefault();
-
       this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
       this.raycaster.setFromCamera(this.mouse, this.camera);
       const intersects = this.raycaster.intersectObjects(this.scene.children);
-
       if (intersects.length > 0) {
         const point = intersects[0].point;
         const flower = this.createFlower();
         flower.position.set(point.x, point.y, point.z);
         flower.scale.set(0.1, 0.1, 0.1);
         this.scene.add(flower);
-
         gsap.to(flower.scale, {
           x: 0.25,
           y: 0.25,
