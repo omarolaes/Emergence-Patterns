@@ -8,8 +8,9 @@ import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 import { gsap } from 'gsap';
 
+
 export default {
-  name: 'NatureSceneMatCap',
+  name: 'NatureScene',
   mounted() {
     this.initScene();
     this.animate();
@@ -38,19 +39,15 @@ export default {
         const textGeometry = new TextGeometry('NATURE', {
           font: font,
           size: 4,
-          height:1,
+          height: 0.5,
         });
 
-        // Load the MatcapTexture
-        const matcapTextureLoader = new THREE.TextureLoader();
-        matcapTextureLoader.load('https://raw.githubusercontent.com/nidorx/matcaps/master/128/39433A_65866E_86BF8B_BFF8D8-128px.png', (texture) => {
-          const textMaterial = new THREE.MeshMatcapMaterial({ matcap: texture });
-          const text = new THREE.Mesh(textGeometry, textMaterial);
-          this.scene.add(text);
-        });
+        const textMaterial = new THREE.MeshNormalMaterial({ color: 0xffffff });
+        const text = new THREE.Mesh(textGeometry, textMaterial);
+        this.scene.add(text);
       });
 
-      this.camera.rotation.y = 0.25;
+      this.camera.rotation.y = 1;
       this.camera.position.z = 8;
       this.camera.position.y = 1;
       this.camera.position.x = 12;
@@ -63,19 +60,15 @@ export default {
 
       const scaleFactor = Math.random() * 0.5 + 0.5;
 
-      // Load the MatcapTexture for spheres
-      const matcapTextureLoader = new THREE.TextureLoader();
-      matcapTextureLoader.load('https://raw.githubusercontent.com/nidorx/matcaps/master/128/39433A_65866E_86BF8B_BFF8D8-128px.png', (texture) => {
-        for (let i = 0; i < 5; i++) {
-          const geometry = new THREE.SphereGeometry((Math.random() * 1) * scaleFactor, 32);
-          const material = new THREE.MeshMatcapMaterial({ matcap: texture });
-          const petal = new THREE.Mesh(geometry, material);
+      for (let i = 0; i < 5; i++) {
+        const geometry = new THREE.SphereGeometry((Math.random() * 1) * scaleFactor, 32);
+        const material = new THREE.MeshNormalMaterial({ color: 0xffffff });
+        const petal = new THREE.Mesh(geometry, material);
 
-          petal.position.x = Math.cos((i * 2 * Math.PI) / 5);
-          petal.position.y = Math.sin((i * 2 * Math.PI) / 5);
-          flower.add(petal);
-        }
-      });
+        petal.position.x = Math.cos((i * 2 * Math.PI) / 5);
+        petal.position.y = Math.sin((i * 2 * Math.PI) / 5);
+        flower.add(petal);
+      }
 
       return flower;
     },

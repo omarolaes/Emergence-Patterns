@@ -5,11 +5,11 @@
 <script>
 import NatureScene from './components/NatureScene.vue'
 
-export default {
+export default{
   name: 'App',
   components: {
     NatureScene
-  }
+  },
 }
 </script>
 

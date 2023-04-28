@@ -38,19 +38,18 @@ export default {
         const textGeometry = new TextGeometry('NATURE', {
           font: font,
           size: 4,
-          height:1,
+          height: 0.5,
         });
 
         // Load the MatcapTexture
         const matcapTextureLoader = new THREE.TextureLoader();
-        matcapTextureLoader.load('https://raw.githubusercontent.com/nidorx/matcaps/master/128/39433A_65866E_86BF8B_BFF8D8-128px.png', (texture) => {
+        matcapTextureLoader.load('https://raw.githubusercontent.com/nidorx/matcaps/master/128/3B3C3F_DAD9D5_929290_ABACA8-128px.png', (texture) => {
           const textMaterial = new THREE.MeshMatcapMaterial({ matcap: texture });
           const text = new THREE.Mesh(textGeometry, textMaterial);
           this.scene.add(text);
         });
       });
 
-      this.camera.rotation.y = 0.25;
       this.camera.position.z = 8;
       this.camera.position.y = 1;
       this.camera.position.x = 12;
@@ -65,9 +64,9 @@ export default {
 
       // Load the MatcapTexture for spheres
       const matcapTextureLoader = new THREE.TextureLoader();
-      matcapTextureLoader.load('https://raw.githubusercontent.com/nidorx/matcaps/master/128/39433A_65866E_86BF8B_BFF8D8-128px.png', (texture) => {
+      matcapTextureLoader.load('https://raw.githubusercontent.com/nidorx/matcaps/master/128/3B3C3F_DAD9D5_929290_ABACA8-128px.png', (texture) => {
         for (let i = 0; i < 5; i++) {
-          const geometry = new THREE.SphereGeometry((Math.random() * 1) * scaleFactor, 32);
+          const geometry = new THREE.CircleGeometry((Math.random() * 1) * scaleFactor, 32);
           const material = new THREE.MeshMatcapMaterial({ matcap: texture });
           const petal = new THREE.Mesh(geometry, material);
 
