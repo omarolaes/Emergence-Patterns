@@ -8,6 +8,15 @@ import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import { gsap } from "gsap";
 
+const textureUrls = [
+  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/9D9D9D_4E4E4E_646464_6C6C6C-256px.png",
+  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/9F9F9F_E4E4E4_D4D4D4_CCCCCC-256px.png",
+  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/A0A8B0_424336_E7E9EF_545C5C-256px.png",
+  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/A48DA4_E8DDE8_C9B7C9_D4C2D4-256px.png"
+];
+
+let currentTextureIndex = 0;
+
 export default {
   name: "NatureSceneMatCap",
   mounted() {
@@ -39,14 +48,14 @@ export default {
       loader.load(
         "https://threejs.org/examples/fonts/helvetiker_regular.typeface.json",
         (font) => {
-          const textGeometry = new TextGeometry("*perro", {
+          const textGeometry = new TextGeometry("*Grow", {
             font: font,
             size: 4,
             height: 1,
           });
           const matcapTextureLoader = new THREE.TextureLoader();
           matcapTextureLoader.load(
-            "https://raw.githubusercontent.com/nidorx/matcaps/master/256/85B9D3_C9EAF9_417277_528789-256px.png",
+            "https://raw.githubusercontent.com/nidorx/matcaps/master/256/A0A8B0_424336_E7E9EF_545C5C-256px.png",
             (texture) => {
               const textMaterial = new THREE.MeshMatcapMaterial({
                 matcap: texture,
@@ -66,27 +75,31 @@ export default {
     },
     createFlower() {
       const flower = new THREE.Group();
-      const scaleFactor = Math.random() * 0.5 + 0.5;
-      const matcapTextureLoader = new THREE.TextureLoader();
-      matcapTextureLoader.load(
-        "https://raw.githubusercontent.com/nidorx/matcaps/master/256/85B9D3_C9EAF9_417277_528789-256px.png",
-        (texture) => {
-          // Create 5 petals
-          for (let i = 0; i < 5; i++) {
-            const geometry = new THREE.SphereGeometry(
-              Math.random() * 1 * scaleFactor,
-              32
-            );
-            const material = new THREE.MeshMatcapMaterial({ matcap: texture });
-            const petal = new THREE.Mesh(geometry, material);
-            petal.position.x = Math.cos((i * 2 * Math.PI) / 5);
-            petal.position.y = Math.sin((i * 2 * Math.PI) / 5);
-            petal.position.z = -0.5;
-            flower.add(petal);
-          }
-        }
-      );
-      return flower;
+  const scaleFactor = Math.random() * 0.5 + 0.5;
+  const matcapTextureLoader = new THREE.TextureLoader();
+  matcapTextureLoader.load(
+    textureUrls[currentTextureIndex],
+    (texture) => {
+      // Create 5 petals
+      for (let i = 0; i < 5; i++) {
+        const geometry = new THREE.SphereGeometry(
+          Math.random() * 1 * scaleFactor,
+          32
+        );
+        const material = new THREE.MeshMatcapMaterial({ matcap: texture });
+        const petal = new THREE.Mesh(geometry, material);
+        petal.position.x = Math.cos((i * 2 * Math.PI) / 5);
+        petal.position.y = Math.sin((i * 2 * Math.PI) / 5);
+        petal.position.z = -0.5;
+        flower.add(petal);
+      }
+    }
+  );
+  currentTextureIndex++;
+  if (currentTextureIndex >= textureUrls.length) {
+    currentTextureIndex = 0;
+  }
+  return flower;
     },
     onMouseMove(event) {
       event.preventDefault();
