@@ -1,5 +1,5 @@
 <template>
-  <div ref="container"></div>
+  <div ref="container" @mousemove="onMouseMove" class="container"></div>
 </template>
 
 <script>
@@ -26,11 +26,9 @@ export default {
     this.initScene();
     this.animate();
     window.addEventListener("resize", this.onWindowResize, false);
-    window.addEventListener("mousemove", this.onMouseMove, false);
   },
   beforeUnmount() {
     window.removeEventListener("resize", this.onWindowResize, false);
-    window.removeEventListener("mousemove", this.onMouseMove, false);
   },
   methods: {
     initScene() {
@@ -52,15 +50,21 @@ export default {
       this.renderer.setPixelRatio(window.devicePixelRatio);
       this.$refs.container.appendChild(this.renderer.domElement);
       this.scene.background = new THREE.Color(0x888888);
+      this.loadText();
+      this.camera.position.z = 10;
+      this.camera.position.x = 0;
+      this.raycaster = new THREE.Raycaster();
+      this.mouse = new THREE.Vector2();
+    },
+    loadText() {
       const loader = new FontLoader();
-      //
       loader.load(
         "https://threejs.org/examples/fonts/helvetiker_regular.typeface.json",
         (font) => {
-          const textGeometry = new TextGeometry("*Grow", {
+          const textGeometry = new TextGeometry("GROW", {
             font: font,
             size: 4,
-            height: 1,
+            height: 2,
           });
           const matcapTextureLoader = new THREE.TextureLoader();
           matcapTextureLoader.load(textTexture, (texture) => {
@@ -69,24 +73,25 @@ export default {
             });
             const text = new THREE.Mesh(textGeometry, textMaterial);
             this.scene.add(text);
-            text.position.x = -8;
-            text.position.y = -2;
+            text.position.set(-6, -2, 0);
+            text.rotation.x = Math.PI * 0.1;
           });
         }
       );
-      this.camera.position.z = 6;
-      this.camera.position.y = 0;
-      this.camera.position.x = 0;
-      this.raycaster = new THREE.Raycaster();
-      this.mouse = new THREE.Vector2();
     },
-    createPetalGeometry() {
+    createPetalGeometry(radius = 0.1) {
       const points = [];
-      for (let i = 0; i < 10; i++) {
-        points.push(new THREE.Vector3(i, i, Math.random() * i * 1.2));
+      for (let i = 0; i < 4; i++) {
+        points.push(
+          new THREE.Vector3(
+            Math.sin(i * 0.1) * 0.5,
+            i,
+            Math.random() * i * 0.85
+          )
+        );
       }
       const curve = new THREE.CatmullRomCurve3(points);
-      const geometry = new THREE.TubeGeometry(curve, 8, 0.15, 8, false);
+      const geometry = new THREE.TubeGeometry(curve, 16, radius, 8, false);
       return geometry;
     },
     createFlower() {
@@ -94,25 +99,17 @@ export default {
       flower.name = "flower";
       const matcapTextureLoader = new THREE.TextureLoader();
       matcapTextureLoader.load(textureUrls[currentTextureIndex], (texture) => {
-        const geometry = this.createPetalGeometry();
         const material = new THREE.MeshMatcapMaterial({ matcap: texture });
-        for (let i = 0; i < 2; i++) {
-          const petal = new THREE.Mesh(geometry, material);
-          petal.position.x = Math.sin(Math.random() * i + 8);
-          petal.position.y = Math.cos(Math.random() * i + 5);
-          petal.position.z = -0.185;
-          if (i % 2 === 0) {
-            petal.rotation.y = 1;
-          } else {
-            petal.rotation.y = -1;
-          }
+        for (let i = 0; i < 3; i++) {
+          const radius = (i + 1) * 0.1;
+          const petalGeometry = this.createPetalGeometry(radius);
+          const petal = new THREE.Mesh(petalGeometry, material);
+          petal.rotation.y = i % 2 === 0 ? 1 : -1;
+          petal.position.set(Math.sin(Math.random() * i * -20), 0, 0);
           flower.add(petal);
         }
       });
-      currentTextureIndex++;
-      if (currentTextureIndex >= textureUrls.length) {
-        currentTextureIndex = 0;
-      }
+      currentTextureIndex = (currentTextureIndex + 1) % textureUrls.length;
       return flower;
     },
     onMouseMove(event) {
@@ -124,17 +121,12 @@ export default {
       if (intersects.length > 0.05) {
         const point = intersects[0].point;
         const flower = this.createFlower();
-        flower.position.set(point.x, point.y, point.z);
-        flower.scale.set(0.01, 0.01, 0.01);
+        flower.position.copy(point);
+        flower.scale.set(0.1, 0.1, 0.1);
         const intersectedObject = intersects[0].object;
         if (intersectedObject.name !== "flower") {
           this.scene.add(flower);
-          gsap.to(flower.scale, {
-            x: 0.08,
-            y: 0.08,
-            z: 0.08,
-            duration: 5,
-          });
+          gsap.to(flower.scale, { x: 0.15, y: (Math.random() * 0.25 + 0.10), z: 0.15, duration: 5 });
         }
       }
     },
