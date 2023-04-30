@@ -4,18 +4,17 @@
 
 <script>
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import { gsap } from "gsap";
 
 const textTexture =
-  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/C7C7D7_4C4E5A_818393_6C6C74-256px.png";
+  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/CBCBCB_595959_8C8C8C_747474-256px.png";
 const textureUrls = [
-  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/4F4C45_A7AEAA_7A8575_9D97A2-256px.png",
-  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/46804D_CBE9AC_90B57C_95D38F-256px.png",
-  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/47392E_997E69_7C6553_8B745F-256px.png",
-  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/0C430C_257D25_439A43_3C683C-256px.png",
+  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/CB4E88_F99AD6_F384C3_ED75B9-256px.png",
+  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/CB919B_F9DDE1_ECC0C8_F4CCD4-256px.png",
+  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/D64480_E27497_EA9BB1_CD156F-256px.png",
+  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/D8388B_230A14_FCC8FC_FC71E1-256px.png",
 ];
 
 let currentTextureIndex = 0;
@@ -42,12 +41,6 @@ export default {
         1000
       );
       this.renderer = new THREE.WebGLRenderer({ antialias: true });
-
-      const orbitControls = new OrbitControls(
-        this.camera,
-        this.renderer.domElement
-      );
-      orbitControls.update();
       this.renderer.setSize(window.innerWidth, window.innerHeight);
       this.renderer.setPixelRatio(window.devicePixelRatio);
       this.$refs.container.appendChild(this.renderer.domElement);
@@ -69,52 +62,55 @@ export default {
             });
             const text = new THREE.Mesh(textGeometry, textMaterial);
             this.scene.add(text);
-            text.position.x = -8;
-            text.position.y = -2;
           });
         }
       );
+      this.camera.rotation.y = 0.25;
       this.camera.position.z = 6;
-      this.camera.position.y = 0;
-      this.camera.position.x = 0;
+      this.camera.position.y = 1.5;
+      this.camera.position.x = 12;
       this.raycaster = new THREE.Raycaster();
       this.mouse = new THREE.Vector2();
     },
     createPetalGeometry() {
-      const points = [];
-      for (let i = 0; i < 10; i++) {
-        points.push(new THREE.Vector3(i, i, Math.random() * i * 1.2));
-      }
-      const curve = new THREE.CatmullRomCurve3(points);
-      const geometry = new THREE.TubeGeometry(curve, 8, 0.15, 8, false);
-      return geometry;
-    },
-    createFlower() {
-      const flower = new THREE.Group();
-      flower.name = "flower";
-      const matcapTextureLoader = new THREE.TextureLoader();
-      matcapTextureLoader.load(textureUrls[currentTextureIndex], (texture) => {
-        const geometry = this.createPetalGeometry();
-        const material = new THREE.MeshMatcapMaterial({ matcap: texture });
-        for (let i = 0; i < 2; i++) {
-          const petal = new THREE.Mesh(geometry, material);
-          petal.position.x = Math.sin(Math.random() * i + 8);
-          petal.position.y = Math.cos(Math.random() * i + 5);
-          petal.position.z = -0.185;
-          if (i % 2 === 0) {
-            petal.rotation.y = 1;
-          } else {
-            petal.rotation.y = -1;
-          }
-          flower.add(petal);
-        }
-      });
-      currentTextureIndex++;
-      if (currentTextureIndex >= textureUrls.length) {
-        currentTextureIndex = 0;
-      }
-      return flower;
-    },
+  const points = [];
+  for (let i = 0; i < 5; i++) {
+    points.push(
+      new THREE.Vector3(
+    Math.sin(i * 0.1) * 0.5,
+    -i,
+    Math.cos(i * 0.1) * 20
+      )
+    ); 
+  }
+  const curve = new THREE.CatmullRomCurve3(points);
+  
+  // Create a TubeGeometry with the curve and a specified radius
+  const geometry = new THREE.TubeGeometry(curve, 16, 0.1, 8, false);
+  
+  return geometry;
+},
+createFlower() {
+  const flower = new THREE.Group();
+  flower.name = "flower";
+  const matcapTextureLoader = new THREE.TextureLoader();
+  matcapTextureLoader.load(textureUrls[currentTextureIndex], (texture) => {
+    const geometry = this.createPetalGeometry(); // Move this line outside of the loop
+    const material = new THREE.MeshMatcapMaterial({ matcap: texture }); // Move this line outside of the loop
+    for (let i = 0; i < 5; i++) {
+      const petal = new THREE.Mesh(geometry, material);
+      petal.position.x = Math.cos(Math.random() * i + 0.5);
+      petal.position.y = Math.sin(Math.random() * i + 0.5);
+      petal.position.z = -0.48;
+      flower.add(petal);
+    }
+  });
+  currentTextureIndex++;
+  if (currentTextureIndex >= textureUrls.length) {
+    currentTextureIndex = 0;
+  }
+  return flower;
+},
     onMouseMove(event) {
       event.preventDefault();
       this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -125,15 +121,15 @@ export default {
         const point = intersects[0].point;
         const flower = this.createFlower();
         flower.position.set(point.x, point.y, point.z);
-        flower.scale.set(0.01, 0.01, 0.01);
+        flower.scale.set(0.015, 0.015, 0.015);
         const intersectedObject = intersects[0].object;
         if (intersectedObject.name !== "flower") {
           this.scene.add(flower);
           gsap.to(flower.scale, {
-            x: 0.08,
-            y: 0.08,
-            z: 0.08,
-            duration: 5,
+            x: 0.25,
+            y: 0.25,
+            z: 0.25,
+            duration: 2,
           });
         }
       }

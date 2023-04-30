@@ -4,18 +4,15 @@
 
 <script>
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import { gsap } from "gsap";
 
-const textTexture =
-  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/C7C7D7_4C4E5A_818393_6C6C74-256px.png";
 const textureUrls = [
-  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/4F4C45_A7AEAA_7A8575_9D97A2-256px.png",
-  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/46804D_CBE9AC_90B57C_95D38F-256px.png",
-  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/47392E_997E69_7C6553_8B745F-256px.png",
-  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/0C430C_257D25_439A43_3C683C-256px.png",
+  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/9D9D9D_4E4E4E_646464_6C6C6C-256px.png",
+  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/9F9F9F_E4E4E4_D4D4D4_CCCCCC-256px.png",
+  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/A0A8B0_424336_E7E9EF_545C5C-256px.png",
+  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/A48DA4_E8DDE8_C9B7C9_D4C2D4-256px.png"
 ];
 
 let currentTextureIndex = 0;
@@ -42,18 +39,12 @@ export default {
         1000
       );
       this.renderer = new THREE.WebGLRenderer({ antialias: true });
-
-      const orbitControls = new OrbitControls(
-        this.camera,
-        this.renderer.domElement
-      );
-      orbitControls.update();
       this.renderer.setSize(window.innerWidth, window.innerHeight);
       this.renderer.setPixelRatio(window.devicePixelRatio);
       this.$refs.container.appendChild(this.renderer.domElement);
       this.scene.background = new THREE.Color(0x888888);
       const loader = new FontLoader();
-      //
+      // 433D3F_A58D7D_786760_8C7C6D
       loader.load(
         "https://threejs.org/examples/fonts/helvetiker_regular.typeface.json",
         (font) => {
@@ -63,57 +54,52 @@ export default {
             height: 1,
           });
           const matcapTextureLoader = new THREE.TextureLoader();
-          matcapTextureLoader.load(textTexture, (texture) => {
-            const textMaterial = new THREE.MeshMatcapMaterial({
-              matcap: texture,
-            });
-            const text = new THREE.Mesh(textGeometry, textMaterial);
-            this.scene.add(text);
-            text.position.x = -8;
-            text.position.y = -2;
-          });
+          matcapTextureLoader.load(
+            "https://raw.githubusercontent.com/nidorx/matcaps/master/256/A0A8B0_424336_E7E9EF_545C5C-256px.png",
+            (texture) => {
+              const textMaterial = new THREE.MeshMatcapMaterial({
+                matcap: texture,
+              });
+              const text = new THREE.Mesh(textGeometry, textMaterial);
+              this.scene.add(text);
+            }
+          );
         }
       );
+      this.camera.rotation.y = 0.25;
       this.camera.position.z = 6;
-      this.camera.position.y = 0;
-      this.camera.position.x = 0;
+      this.camera.position.y = 1.5;
+      this.camera.position.x = 12
       this.raycaster = new THREE.Raycaster();
       this.mouse = new THREE.Vector2();
     },
-    createPetalGeometry() {
-      const points = [];
-      for (let i = 0; i < 10; i++) {
-        points.push(new THREE.Vector3(i, i, Math.random() * i * 1.2));
-      }
-      const curve = new THREE.CatmullRomCurve3(points);
-      const geometry = new THREE.TubeGeometry(curve, 8, 0.15, 8, false);
-      return geometry;
-    },
     createFlower() {
       const flower = new THREE.Group();
-      flower.name = "flower";
-      const matcapTextureLoader = new THREE.TextureLoader();
-      matcapTextureLoader.load(textureUrls[currentTextureIndex], (texture) => {
-        const geometry = this.createPetalGeometry();
+  const scaleFactor = Math.random() * 0.5 + 0.5;
+  const matcapTextureLoader = new THREE.TextureLoader();
+  matcapTextureLoader.load(
+    textureUrls[currentTextureIndex],
+    (texture) => {
+      // Create 5 petals
+      for (let i = 0; i < 5; i++) {
+        const geometry = new THREE.SphereGeometry(
+          Math.random() * 1 * scaleFactor,
+          32
+        );
         const material = new THREE.MeshMatcapMaterial({ matcap: texture });
-        for (let i = 0; i < 2; i++) {
-          const petal = new THREE.Mesh(geometry, material);
-          petal.position.x = Math.sin(Math.random() * i + 8);
-          petal.position.y = Math.cos(Math.random() * i + 5);
-          petal.position.z = -0.185;
-          if (i % 2 === 0) {
-            petal.rotation.y = 1;
-          } else {
-            petal.rotation.y = -1;
-          }
-          flower.add(petal);
-        }
-      });
-      currentTextureIndex++;
-      if (currentTextureIndex >= textureUrls.length) {
-        currentTextureIndex = 0;
+        const petal = new THREE.Mesh(geometry, material);
+        petal.position.x = Math.cos((i * 2 * Math.PI) / 5);
+        petal.position.y = Math.sin((i * 2 * Math.PI) / 5);
+        petal.position.z = -0.5;
+        flower.add(petal);
       }
-      return flower;
+    }
+  );
+  currentTextureIndex++;
+  if (currentTextureIndex >= textureUrls.length) {
+    currentTextureIndex = 0;
+  }
+  return flower;
     },
     onMouseMove(event) {
       event.preventDefault();
@@ -121,21 +107,18 @@ export default {
       this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
       this.raycaster.setFromCamera(this.mouse, this.camera);
       const intersects = this.raycaster.intersectObjects(this.scene.children);
-      if (intersects.length > 0.05) {
+      if (intersects.length > 0) {
         const point = intersects[0].point;
         const flower = this.createFlower();
         flower.position.set(point.x, point.y, point.z);
-        flower.scale.set(0.01, 0.01, 0.01);
-        const intersectedObject = intersects[0].object;
-        if (intersectedObject.name !== "flower") {
-          this.scene.add(flower);
-          gsap.to(flower.scale, {
-            x: 0.08,
-            y: 0.08,
-            z: 0.08,
-            duration: 5,
-          });
-        }
+        flower.scale.set(0.1, 0.1, 0.1);
+        this.scene.add(flower);
+        gsap.to(flower.scale, {
+          x: 0.25,
+          y: 0.25,
+          z: 0.25,
+          duration: 0.5,
+        });
       }
     },
     animate() {
