@@ -10,12 +10,12 @@ import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import { gsap } from "gsap";
 
 const textTexture =
-  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/C7C7D7_4C4E5A_818393_6C6C74-256px.png";
+  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/3B3C3F_DAD9D5_929290_ABACA8-256px.png";
 const textureUrls = [
-  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/4F4C45_A7AEAA_7A8575_9D97A2-256px.png",
-  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/46804D_CBE9AC_90B57C_95D38F-256px.png",
-  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/47392E_997E69_7C6553_8B745F-256px.png",
-  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/0C430C_257D25_439A43_3C683C-256px.png",
+  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/7877EE_D87FC5_75D9C7_1C78C0-256px.png",
+  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/515151_DCDCDC_B7B7B7_9B9B9B-256px.png",
+  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/6BBD6B_C8F3C8_A3E2A3_B4ECB4-256px.png",
+  "https://raw.githubusercontent.com/nidorx/matcaps/master/256/6C52AA_C9A6EA_A681D6_B494E2-256px.png",
 ];
 
 let currentTextureIndex = 0;
@@ -51,33 +51,30 @@ export default {
       this.$refs.container.appendChild(this.renderer.domElement);
       this.scene.background = new THREE.Color(0x888888);
       this.loadText();
-      this.camera.position.z = 10;
+      this.camera.position.z = 8;
       this.camera.position.x = 0;
       this.raycaster = new THREE.Raycaster();
       this.mouse = new THREE.Vector2();
     },
     loadText() {
       const loader = new FontLoader();
-      loader.load(
-        "https://threejs.org/examples/fonts/helvetiker_regular.typeface.json",
-        (font) => {
-          const textGeometry = new TextGeometry("GROW", {
-            font: font,
-            size: 4,
-            height: 2,
+      loader.load("/picnic.json", (font) => {
+        const textGeometry = new TextGeometry("grow", {
+          font: font,
+          size: 4,
+          height: 1,
+        });
+        const matcapTextureLoader = new THREE.TextureLoader();
+        matcapTextureLoader.load(textTexture, (texture) => {
+          const textMaterial = new THREE.MeshMatcapMaterial({
+            matcap: texture,
           });
-          const matcapTextureLoader = new THREE.TextureLoader();
-          matcapTextureLoader.load(textTexture, (texture) => {
-            const textMaterial = new THREE.MeshMatcapMaterial({
-              matcap: texture,
-            });
-            const text = new THREE.Mesh(textGeometry, textMaterial);
-            this.scene.add(text);
-            text.position.set(-6, -2, 0);
-            text.rotation.x = Math.PI * 0.1;
-          });
-        }
-      );
+          const text = new THREE.Mesh(textGeometry, textMaterial);
+          this.scene.add(text);
+          text.position.set(-6.5, -1.5, 0);
+          text.rotation.x = Math.PI * 0.1;
+        });
+      });
     },
     createPetalGeometry(radius = 0.1) {
       const points = [];
@@ -100,12 +97,12 @@ export default {
       const matcapTextureLoader = new THREE.TextureLoader();
       matcapTextureLoader.load(textureUrls[currentTextureIndex], (texture) => {
         const material = new THREE.MeshMatcapMaterial({ matcap: texture });
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 2; i++) {
           const radius = (i + 1) * 0.1;
           const petalGeometry = this.createPetalGeometry(radius);
           const petal = new THREE.Mesh(petalGeometry, material);
           petal.rotation.y = i % 2 === 0 ? 1 : -1;
-          petal.position.set(Math.sin(Math.random() * i * -20), 0, 0);
+          petal.position.set(Math.sin(Math.random() * i * -20), Math.random() - 0.5, 0);
           flower.add(petal);
         }
       });
@@ -126,7 +123,12 @@ export default {
         const intersectedObject = intersects[0].object;
         if (intersectedObject.name !== "flower") {
           this.scene.add(flower);
-          gsap.to(flower.scale, { x: 0.15, y: (Math.random() * 0.25 + 0.10), z: 0.15, duration: 5 });
+          gsap.to(flower.scale, {
+            x: 0.15,
+            y: Math.random() * 0.25 + 0.05,
+            z: 0.15,
+            duration: 5,
+          });
         }
       }
     },
