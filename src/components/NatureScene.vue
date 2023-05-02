@@ -46,13 +46,13 @@ export default {
         this.renderer.domElement
       );
       orbitControls.update();
+  orbitControls.autoRotate = true;
       this.renderer.setSize(window.innerWidth, window.innerHeight);
       this.renderer.setPixelRatio(window.devicePixelRatio);
       this.$refs.container.appendChild(this.renderer.domElement);
       this.scene.background = new THREE.Color(0x888888);
       this.loadText();
       this.camera.position.z = 8;
-      this.camera.position.x = 0;
       this.raycaster = new THREE.Raycaster();
       this.mouse = new THREE.Vector2();
     },
@@ -62,7 +62,7 @@ export default {
         const textGeometry = new TextGeometry("grow", {
           font: font,
           size: 4,
-          height: 1,
+          height: .5,
         });
         const matcapTextureLoader = new THREE.TextureLoader();
         matcapTextureLoader.load(textTexture, (texture) => {
@@ -71,8 +71,8 @@ export default {
           });
           const text = new THREE.Mesh(textGeometry, textMaterial);
           this.scene.add(text);
-          text.position.set(-6.5, -1.5, 0);
-          text.rotation.x = Math.PI * 0.1;
+          text.position.set(-7, 0, 0);
+          text.rotation.y = Math.PI * 0;
         });
       });
     },
@@ -97,12 +97,17 @@ export default {
       const matcapTextureLoader = new THREE.TextureLoader();
       matcapTextureLoader.load(textureUrls[currentTextureIndex], (texture) => {
         const material = new THREE.MeshMatcapMaterial({ matcap: texture });
-        for (let i = 0; i < 2; i++) {
+        for (let i = 0; i <= 1; i++) {
           const radius = (i + 1) * 0.1;
           const petalGeometry = this.createPetalGeometry(radius);
           const petal = new THREE.Mesh(petalGeometry, material);
           petal.rotation.y = i % 2 === 0 ? 1 : -1;
-          petal.position.set(Math.sin(Math.random() * i * -20), Math.random() - 0.5, 0);
+          petal.rotation.x = Math.PI * 0.1;
+          petal.position.set(
+            Math.sin(Math.random() * i * -20),
+            Math.random() * 0.1 + 0.25,
+            -0.1
+          );
           flower.add(petal);
         }
       });
@@ -127,7 +132,7 @@ export default {
             x: 0.15,
             y: Math.random() * 0.25 + 0.05,
             z: 0.15,
-            duration: 5,
+            duration: Math.floor(Math.random() * (15 - 2 + 1)) + 2,
           });
         }
       }
