@@ -5,13 +5,13 @@ import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import { gsap } from "gsap";
 
 const textTexture =
-    "https://raw.githubusercontent.com/nidorx/matcaps/master/256/3E95CC_65D9F1_A2E2F6_679BD4-256px.png";
+    "https://raw.githubusercontent.com/nidorx/matcaps/master/256/D8D8E5_9D9DAF_B4B4C4_B4B4CC-256px.png";
 
 const textureUrls = [
-    "https://raw.githubusercontent.com/nidorx/matcaps/master/256/D0CCCB_524D50_928891_727581-256px.png",
-    "https://raw.githubusercontent.com/nidorx/matcaps/master/256/D5B5B4_9E6C6F_F5E9EF_A57986-256px.png",
-    "https://raw.githubusercontent.com/nidorx/matcaps/master/256/D5D5D5_929292_ACACAC_B4B4B4-256px.png",
-    "https://raw.githubusercontent.com/nidorx/matcaps/master/256/D7DFDB_AAB5AF_F5FAF7_BCC4C4-256px.png",
+    "https://raw.githubusercontent.com/nidorx/matcaps/master/256/D8D8E5_9D9DAF_B4B4C4_B4B4CC-256px.png",
+    "https://raw.githubusercontent.com/nidorx/matcaps/master/256/D8D8E5_9D9DAF_B4B4C4_B4B4CC-256px.png",
+    "https://raw.githubusercontent.com/nidorx/matcaps/master/256/D8D8E5_9D9DAF_B4B4C4_B4B4CC-256px.png",
+    "https://raw.githubusercontent.com/nidorx/matcaps/master/256/D8D8E5_9D9DAF_B4B4C4_B4B4CC-256px.png",
 ];
 
 let currentTextureIndex = 0;
@@ -56,7 +56,7 @@ function loadText() {
             });
             const text = new THREE.Mesh(textGeometry, textMaterial);
             scene.add(text);
-            text.position.set(-4, -3.5, 0);
+            text.position.set(-4, -4, 0);
             text.rotation.y = Math.PI * 0.1;
             text.rotation.x = Math.PI * 0.1;
         });
