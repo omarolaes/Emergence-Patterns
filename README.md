@@ -1,12 +1,11 @@
-# Growing Organisms
+# Emergent Patterns
 
-Interactive Three.js and GSAP scene that represents the growth and development of life forms using 3D shapes and animations. 
+Interactive Three.js and GSAP scene that represents the growth and development of life organisms using 3D shapes and animations. 
 
 ## Project Overview
 
-At its core, Growing Organisms is built around a simple yet captivating concept: generating 3D text that sprouts dynamic and interactive 3D shapes. As you move your mouse over the text, you'll see these shapes spring to life, creating an organic experience.
+Emergent Patterns is an early stage exploration into an immersive simulation of growth, adaptability, complexity through 3D shapes representations.
 
-As the project evolves, we plan to incorporate mathematical and biological formulas to create more realistic and complex life forms.
 
 ## Getting Started
 
