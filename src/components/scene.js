@@ -4,8 +4,9 @@ import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import { gsap } from "gsap";
 
+// Define reusable variables
 const textTexture =
-    "https://raw.githubusercontent.com/nidorx/matcaps/master/256/D8D8E5_9D9DAF_B4B4C4_B4B4CC-256px.png";
+    "https://raw.githubusercontent.com/nidorx/matcaps/master/256/85B9D3_C9EAF9_417277_528789-256px.png";
 
 const textureUrls = [
     "https://raw.githubusercontent.com/nidorx/matcaps/master/256/D8D8E5_9D9DAF_B4B4C4_B4B4CC-256px.png",
@@ -18,6 +19,10 @@ let currentTextureIndex = 0;
 
 let scene, camera, renderer, raycaster, mouse;
 
+/**
+ * Initialize the scene, camera, and renderer
+ * @param {HTMLElement} container - The container to append the renderer's DOM element
+ */
 export function initScene(container) {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(
@@ -28,26 +33,35 @@ export function initScene(container) {
     );
     renderer = new THREE.WebGLRenderer({ antialias: true });
 
+    // Setup OrbitControls
     const orbitControls = new OrbitControls(camera, renderer.domElement);
     orbitControls.update();
     orbitControls.autoRotate = true;
+
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     container.value.appendChild(renderer.domElement);
     scene.background = new THREE.Color(0x888888);
+
+    // Load the text object
     loadText();
+
     camera.position.z = 8;
+
     raycaster = new THREE.Raycaster();
     mouse = new THREE.Vector2();
 }
 
+/**
+ * Load the text object and add it to the scene
+ */
 function loadText() {
     const loader = new FontLoader();
     loader.load("/picnic.json", (font) => {
         const textGeometry = new TextGeometry("Z", {
             font: font,
             size: 8,
-            height:2,
+            height: 2,
         });
         const matcapTextureLoader = new THREE.TextureLoader();
         matcapTextureLoader.load(textTexture, (texture) => {
@@ -63,6 +77,11 @@ function loadText() {
     });
 }
 
+/**
+ * Create a petal geometry
+ * @param {number} [radius=0.1] - The radius of the petal geometry
+ * @returns {THREE.TubeGeometry} The petal geometry
+ */
 function createPetalGeometry(radius = 0.1) {
     const points = [];
     for (let i = 0; i < 5; i++) {
@@ -79,6 +98,10 @@ function createPetalGeometry(radius = 0.1) {
     return geometry;
 }
 
+/**
+ * Create a flower object
+ * @returns {THREE.Group} The flower object
+ */
 function createFlower() {
     const flower = new THREE.Group();
     flower.name = "flower";
@@ -103,18 +126,24 @@ function createFlower() {
     return flower;
 }
 
+/**
+ * Handle mouse move events
+ * @param {MouseEvent} event - The mouse move event
+ */
 export function onMouseMove(event) {
     event.preventDefault();
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
     const intersects = raycaster.intersectObjects(scene.children);
+
     if (intersects.length > 0.05) {
         const point = intersects[0].point;
         const flower = createFlower();
         flower.position.copy(point);
         flower.scale.set(0.1, 0.1, 0.1);
         const intersectedObject = intersects[0].object;
+
         if (intersectedObject.name !== "flower") {
             scene.add(flower);
             gsap.to(flower.scale, {
@@ -127,11 +156,17 @@ export function onMouseMove(event) {
     }
 }
 
+/**
+ * Render the animation loop
+ */
 export function animate() {
     requestAnimationFrame(animate);
     renderer.render(scene, camera);
 }
 
+/**
+ * Handle window resize events
+ */
 export function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
